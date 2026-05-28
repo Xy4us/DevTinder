@@ -1,35 +1,32 @@
 const express = require("express");
+const connectDB = require("./config/database");
+const app = express();
+const User = require("./models/user");
 
-const app = express(); // creating an express application
+//Middleware to parse JSON bodies of incoming requests
+app.use(express.json());
 
-//This will match only GET HTTP method API calls to /user endpoint
-app.get("/user", (req, res) => {
-  res.send({
-    firstName: "John",
-    lastName: "Doe",
+app.post("/signup", async (req, res) => {
+  //Creating new instance of the UserModel
+  const user = new User(req.body);
+
+  try {
+    await user.save();
+    res.send("User signed up successfully!");
+  } catch (error) {
+    console.error("Error signing up user", error);
+    res.status(400).send("Error saving the user:" + error.message);
+  }
+  //Creating a new instance of the model and saving it to the database
+});
+
+connectDB()
+  .then(() => {
+    console.log("Connected to MongoDB");
+    app.listen(3000, () => {
+      console.log("Server is running on http://localhost:3000");
+    });
+  })
+  .catch((err) => {
+    console.error("Error connecting to MongoDB", err);
   });
-});
-
-app.post("/user", (req, res) => {
-  // Saving Data to DB
-  res.send("Data Saved Successfully!");
-});
-
-app.patch("/user", (req, res) => {
-  // Updating Data in DB
-  res.send("Data Updated Successfully!");
-});
-
-app.delete("/user", (req, res) => {
-  // Deleting Data from DB
-  res.send("Data Deleted Successfully!");
-});
-
-//This will match all the HTTP methods API calls to test (eg. GET, POST, etc.)
-app.use("/test", (req, res) => {
-  res.send("Hello from server!");
-});
-
-app.listen(3000, () => {
-  console.log("Server is running on http://localhost:3000");
-});
