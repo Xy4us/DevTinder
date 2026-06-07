@@ -18,7 +18,61 @@ app.post("/signup", async (req, res) => {
     console.error("Error signing up user", error);
     res.status(400).send("Error saving the user:" + error.message);
   }
-  //Creating a new instance of the model and saving it to the database
+});
+
+//find user by email
+app.get("/user", async (req, res) => {
+  const userEmail = req.body.emailId;
+
+  try {
+    const users = await User.findOne({ emailId: userEmail });
+    if (users.length === 0) {
+      res.status(404).send("User not found");
+    } else {
+      res.send(users);
+    }
+  } catch (err) {
+    res.status(400).send("Something went wrong!");
+  }
+});
+
+//Feed api - get feed -> get all the user form the database
+app.get("/feed", async (req, res) => {
+  try {
+    const users = await User.find({});
+    res.send(users);
+  } catch (err) {
+    res.status(400).send("Something went wrong!");
+  }
+});
+
+//Delete user by email
+app.delete("/user", async (req, res) => {
+  const userId = req.body.userId;
+
+  try {
+    const user = await User.findByIdAndDelete(userId);
+    res.send("User deleted successfully!");
+  } catch (err) {
+    res.status(400).send("Something went wrong!");
+  }
+});
+
+//Update the data of the user
+app.patch("/user", async (req, res) => {
+  const userId = req.body.userId;
+  const data = req.body;
+
+  try {
+    const user = await User.findByIdAndUpdate(userId, data, {
+      returnDocument: "after",
+      runValidators: true,
+    });
+
+    res.send("User updated successfully!");
+  } catch (err) {
+    res.status(400).send("Update failed! " + err.message);
+  }
 });
 
 connectDB()
