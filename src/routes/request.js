@@ -51,7 +51,51 @@ requestRouter.post(
         connectionRequest,
       });
     } catch (err) {
-      res.status(400).send("Something went wrong! " + err.message);
+      res.status(400).json({
+        message: "Something went wrong! " + err.message,
+      });
+    }
+  },
+);
+
+requestRouter.post(
+  "/request/review/:status/:requestId",
+  userAuth,
+  async (req, res) => {
+    try {
+      const loggedInUser = req?.user;
+      const { status, requestId } = req?.params;
+
+      //Validate the status
+      const allowedStatus = ["accepted", "rejected"];
+
+      if (!allowedStatus.includes(status)) {
+        throw new Error("Invalid status type." + req?.params?.status);
+      }
+
+      const connectionRequest = await ConnectionRequest.findOne({
+        _id: requestId,
+        toUserId: loggedInUser._id,
+        status: "interested",
+      });
+
+      if (!connectionRequest) {
+        throw new Error("Connection request not found or already processed.");
+      }
+
+      connectionRequest.status = status;
+      const data = await connectionRequest.save();
+
+      res.json({
+        message: "Connection request " + status + " successfully.",
+        data,
+      });
+
+      //requestId should be valid
+    } catch (err) {
+      res.status(400).json({
+        message: "Something went wrong! " + err.message,
+      });
     }
   },
 );
