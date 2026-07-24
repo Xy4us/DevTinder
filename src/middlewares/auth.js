@@ -26,7 +26,6 @@ const userAuth = async (req, res, next) => {
 
     next();
   } catch (error) {
-    console.error("Error in userAuth middleware", error);
     res.status(401).send("Unauthorized: " + error.message);
   }
 };

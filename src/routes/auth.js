@@ -75,7 +75,10 @@ authRouter.post("/login", async (req, res) => {
       //Add the token to cokkie and send the response back to the user
       res.cookie("token", token, { maxAge: 30 * 24 * 60 * 60 * 1000 }); //30 days
 
-      res.send("Login successful!");
+      res.json({
+        message: "Login successful!",
+        user,
+      });
     } else {
       throw new Error("Invalid credentials!");
     }

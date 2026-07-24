@@ -4,7 +4,14 @@ const express = require("express");
 const connectDB = require("./config/database");
 const cookieParser = require("cookie-parser");
 const app = express();
+const cors = require("cors");
 
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true, // Allow cookies to be sent
+  }),
+);
 //Middleware to parse JSON bodies of incoming requests
 app.use(express.json());
 //Middle ware to parse cookies from incoming requests
@@ -118,8 +125,8 @@ app.use("/", userRouter);
 connectDB()
   .then(() => {
     console.log("Connected to MongoDB");
-    app.listen(3000, () => {
-      console.log("Server is running on http://localhost:3000");
+    app.listen(7777, () => {
+      console.log("Server is running on http://localhost:7777");
     });
   })
   .catch((err) => {
